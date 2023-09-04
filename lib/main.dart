@@ -45,10 +45,11 @@ class _MyAppState extends ConsumerState<MyApp> {
     deviceHeight = MediaQuery.of(context).size.height;
     deviceWidth = MediaQuery.of(context).size.width;
     return ref.watch(authStateChangeProvider).when(
-        data: (data) => MaterialApp.router(
-              debugShowCheckedModeBanner: false,
-              theme: Pallete.darkModeAppTheme,
-              routerDelegate: RoutemasterDelegate(routesBuilder: (context) {
+          data: (data) => MaterialApp.router(
+            debugShowCheckedModeBanner: false,
+            theme: ref.watch(themeNotifierProvider),
+            routerDelegate: RoutemasterDelegate(
+              routesBuilder: (context) {
                 if (data != null) {
                   getUser(ref, data);
                   if (userModel != null) {
@@ -56,10 +57,13 @@ class _MyAppState extends ConsumerState<MyApp> {
                   }
                 }
                 return loggedOutRoute;
-              }),
-              routeInformationParser: const RoutemasterParser(),
+              },
             ),
-        error: (error, stackTrace) => ErrorText(errorMessage: error.toString()),
-        loading: () => const Loader());
+            routeInformationParser: const RoutemasterParser(),
+          ),
+          error: (error, stackTrace) =>
+              ErrorText(errorMessage: error.toString()),
+          loading: () => const Loader(),
+        );
   }
 }

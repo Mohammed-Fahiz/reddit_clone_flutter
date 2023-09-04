@@ -33,6 +33,12 @@ final getCommunityByNameProvider = StreamProvider.family((ref, String name) {
       .getCommunityByName(name);
 });
 
+final searchCommunitiesProvider = StreamProvider.family((ref, String query) {
+  return ref
+      .watch(communityControllerProvider.notifier)
+      .searchCommunities(query);
+});
+
 //TODO change to Notifier
 class CommunityController extends StateNotifier<bool> {
   final CommunityRepository _communityRepository;
@@ -62,19 +68,11 @@ class CommunityController extends StateNotifier<bool> {
 
     final res = await _communityRepository.createCommunity(community);
     state = false;
-    res.fold((l) => showSnackBar(errMsg: l.message, context: context), (r) {
-      showSnackBar(errMsg: "Community created Successfully!", context: context);
+    res.fold((l) => showSnackBar(message: l.message, context: context), (r) {
+      showSnackBar(
+          message: "Community created Successfully!", context: context);
       Routemaster.of(context).pop();
     });
-  }
-
-  Stream<List<Community>> getUserCommunities() {
-    String uid = _ref.read(userProvider)!.uid;
-    return _communityRepository.getUserCommunities(uid);
-  }
-
-  Stream<Community> getCommunityByName(String name) {
-    return _communityRepository.getCommunityByName(name);
   }
 
   Future<void> editCommunity(
@@ -87,7 +85,7 @@ class CommunityController extends StateNotifier<bool> {
       final res = await _storageRepository.storeFile(
           path: "communities/banner", id: community.name, file: bannerFile);
 
-      res.fold((l) => showSnackBar(errMsg: l.message, context: context),
+      res.fold((l) => showSnackBar(message: l.message, context: context),
           (url) => community = community.copyWith(banner: url));
     }
 
@@ -95,13 +93,63 @@ class CommunityController extends StateNotifier<bool> {
       final res = await _storageRepository.storeFile(
           path: "communities/profile", id: community.name, file: profileFile);
 
-      res.fold((l) => showSnackBar(context: context, errMsg: l.message),
+      res.fold((l) => showSnackBar(context: context, message: l.message),
           (url) => community = community.copyWith(avatar: url));
     }
 
     final res = await _communityRepository.editCommunity(community);
     state = false;
-    res.fold((l) => showSnackBar(errMsg: l.message, context: context),
+    res.fold((l) => showSnackBar(message: l.message, context: context),
+        (r) => Routemaster.of(context).pop());
+  }
+
+  joinOrLeaveCommunity(
+      {required Community community, required BuildContext context}) async {
+    state = true;
+    final user = _ref.read(userProvider);
+    List<String> membersList = List<String>.from(community.members);
+    membersList.contains(user!.uid)
+        ? membersList.remove(user.uid)
+        : membersList.add(user.uid);
+    final updateCommunity = community.copyWith(members: membersList);
+    final res =
+        await _communityRepository.joinOrLeaveCommunity(updateCommunity);
+    state = false;
+    res.fold(
+      (l) => showSnackBar(message: l.message, context: context),
+      (r) {
+        if (community.members.contains(user.uid)) {
+          showSnackBar(
+              message: "Left community successfully", context: context);
+        } else {
+          showSnackBar(message: "Joined community", context: context);
+        }
+      },
+    );
+  }
+
+  Stream<List<Community>> searchCommunities(String query) {
+    return _communityRepository.searchCommunities(query);
+  }
+
+  Stream<List<Community>> getUserCommunities() {
+    String uid = _ref.read(userProvider)!.uid;
+    return _communityRepository.getUserCommunities(uid);
+  }
+
+  Stream<Community> getCommunityByName(String name) {
+    return _communityRepository.getCommunityByName(name);
+  }
+
+  Future<void> editModerators(
+      {required Community community, required BuildContext context}) async {
+    List<String> modsList = List<String>.from(community.mods);
+
+    final updateCommunity = community.copyWith(mods: modsList);
+
+    final res = await _communityRepository.editModerators(updateCommunity);
+
+    res.fold((l) => showSnackBar(context: context, message: l.message),
         (r) => Routemaster.of(context).pop());
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reddit_clone/core/common/error_text.dart';
 import 'package:reddit_clone/features/community/controller/community_controller.dart';
+import 'package:reddit_clone/models/commuity_model.dart';
 import 'package:routemaster/routemaster.dart';
 import '../../../core/common/loader.dart';
 import '../../auth/controller/auth_controller.dart';
@@ -9,8 +10,18 @@ import '../../auth/controller/auth_controller.dart';
 class CommunityPage extends ConsumerWidget {
   final String name;
   const CommunityPage({super.key, required this.name});
+
   navigateToModTools(BuildContext context) {
     Routemaster.of(context).push("/mod-tools/$name");
+  }
+
+  joinOrLeaveCommunity(
+      {required WidgetRef ref,
+      required Community community,
+      required BuildContext context}) {
+    ref
+        .read(communityControllerProvider.notifier)
+        .joinOrLeaveCommunity(community: community, context: context);
   }
 
   @override
@@ -73,7 +84,12 @@ class CommunityPage extends ConsumerWidget {
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 16),
                                       ),
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        joinOrLeaveCommunity(
+                                            ref: ref,
+                                            context: context,
+                                            community: community);
+                                      },
                                       child: Text(
                                           community.members.contains(user.uid)
                                               ? "Joined"

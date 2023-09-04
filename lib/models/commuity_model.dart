@@ -3,10 +3,10 @@ class Community {
   final String name;
   final String banner;
   final String avatar;
-  final List members;
-  final List mods;
+  final List<String> members;
+  final List<String> mods;
 
-  const Community({
+  Community({
     required this.id,
     required this.name,
     required this.banner,
@@ -46,8 +46,8 @@ class Community {
     String? name,
     String? banner,
     String? avatar,
-    List? members,
-    List? mods,
+    List<String>? members,
+    List<String>? mods,
   }) {
     return Community(
       id: id ?? this.id,
@@ -76,8 +76,8 @@ class Community {
       name: map['name'] as String,
       banner: map['banner'] as String,
       avatar: map['avatar'] as String,
-      members: map['members'] as List,
-      mods: map['mods'] as List,
+      members: List<String>.from(map['members']),
+      mods: List<String>.from(map['mods']),
     );
   }
 }

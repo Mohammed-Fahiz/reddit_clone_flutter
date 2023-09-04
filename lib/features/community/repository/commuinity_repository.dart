@@ -73,4 +73,50 @@ class CommunityRepository {
       );
     }
   }
+
+  Stream<List<Community>> searchCommunities(String query) {
+    return _community
+        .where(
+          "name",
+          isGreaterThanOrEqualTo: query.isEmpty
+              ? 0
+              : query, // Search for names that start with the query
+          isLessThanOrEqualTo: '$query\uf8ff',
+        )
+        .snapshots()
+        .map((event) {
+      List<Community> communities = [];
+      for (var community in event.docs) {
+        communities.add(
+          Community.fromMap(community.data() as Map<String, dynamic>),
+        );
+      }
+      return communities;
+    });
+  }
+
+  FutureVoid joinOrLeaveCommunity(Community community) async {
+    try {
+      return right(
+          await _community.doc(community.name).update(community.toMap()));
+    } on FirebaseException catch (e) {
+      throw e.message!;
+    } catch (e) {
+      return left(
+        Failure(
+          message: e.toString(),
+        ),
+      );
+    }
+  }
+
+  FutureVoid editModerators(Community community) async {
+    try {
+      return right(_community.doc(community.name).update(community.toMap()));
+    } on FirebaseException catch (e) {
+      throw e.message!;
+    } catch (e) {
+      return left(Failure(message: e.toString()));
+    }
+  }
 }

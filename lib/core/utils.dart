@@ -1,8 +1,8 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
-void showSnackBar({required String errMsg, required BuildContext context}) {
-  final snackBar = SnackBar(content: Text(errMsg));
+void showSnackBar({required String message, required BuildContext context}) {
+  final snackBar = SnackBar(content: Text(message));
   ScaffoldMessenger.of(context)
     ..hideCurrentSnackBar()
     ..showSnackBar(snackBar);

@@ -47,7 +47,7 @@ class AuthRepository {
       if (userCredential.additionalUserInfo!.isNewUser) {
         userModel = UserModel(
             name: user.displayName ?? "No name",
-            profilePic: Constants.avatarDefault,
+            profilePic: user.photoURL ?? Constants.avatarDefault,
             banner: Constants.bannerDefault,
             isGuest: false,
             awards: [],
@@ -72,5 +72,10 @@ class AuthRepository {
   Stream<UserModel> getUserData(String uid) {
     return _users.doc(uid).snapshots().map(
         (event) => UserModel.fromMap(event.data() as Map<String, dynamic>));
+  }
+
+  void logOut() async {
+    await _googleSignIn.signOut();
+    await _auth.signOut();
   }
 }
