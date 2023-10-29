@@ -1,60 +1,57 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:reddit_clone/Theme/pallette.dart';
-import 'package:reddit_clone/core/global%20variables/global_variables.dart';
-import 'package:reddit_clone/features/auth/controller/auth_controller.dart';
+import 'package:reddit_clone/features/auth/controlller/auth_controller.dart';
+import 'package:reddit_clone/theme/pallete.dart';
 import 'package:routemaster/routemaster.dart';
 
 class ProfileDrawer extends ConsumerWidget {
   const ProfileDrawer({super.key});
+
   void logOut(WidgetRef ref) {
-    ref.read(authControllerProvider.notifier).logOut();
+    ref.read(authControllerProvider.notifier).logout();
   }
 
-  void navigateToProfilePage(BuildContext context, String uid) {
-    Routemaster.of(context).push("/user-profile/$uid");
+  void navigateToUserProfile(BuildContext context, String uid) {
+    Routemaster.of(context).push('/u/$uid');
   }
 
   void toggleTheme(WidgetRef ref) {
-    ref.watch(themeNotifierProvider.notifier).toggleTheme();
+    ref.read(themeNotifierProvider.notifier).toggleTheme();
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(userProvider);
-    return SafeArea(
-      child: Drawer(
+    final user = ref.watch(userProvider)!;
+
+    return Drawer(
+      child: SafeArea(
         child: Column(
           children: [
-            const SizedBox(
-              height: 20,
-            ),
             CircleAvatar(
-              radius: deviceWidth * .2,
-              backgroundImage: NetworkImage(user!.profilePic),
+              backgroundImage: NetworkImage(user.profilePic),
+              radius: 70,
             ),
-            const SizedBox(
-              height: 20,
-            ),
+            const SizedBox(height: 10),
             Text(
-              "u/${user.name}",
-              style: const TextStyle(fontSize: 18),
+              'u/${user.name}',
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-            const SizedBox(
-              height: 20,
-            ),
+            const SizedBox(height: 10),
             const Divider(),
             ListTile(
-              leading: const Icon(Icons.account_circle),
-              title: const Text("My profile"),
-              onTap: () => navigateToProfilePage(context, user.uid),
+              title: const Text('My Profile'),
+              leading: const Icon(Icons.person),
+              onTap: () => navigateToUserProfile(context, user.uid),
             ),
             ListTile(
-              leading: const Icon(
+              title: const Text('Log Out'),
+              leading: Icon(
                 Icons.logout,
-                color: Colors.red,
+                color: Pallete.redColor,
               ),
-              title: const Text("Log Out"),
               onTap: () => logOut(ref),
             ),
             Switch.adaptive(

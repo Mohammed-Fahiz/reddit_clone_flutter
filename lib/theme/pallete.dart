@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-final themeNotifierProvider =
-    StateNotifierProvider<ThemeNotifier, ThemeData>((ref) {
+final themeNotifierProvider = StateNotifierProvider<ThemeNotifier, ThemeData>((ref) {
   return ThemeNotifier();
 });
 
@@ -30,8 +29,7 @@ class Pallete {
       backgroundColor: drawerColor,
     ),
     primaryColor: redColor,
-    backgroundColor:
-        drawerColor, // will be used as alternative background color
+    backgroundColor: drawerColor, // will be used as alternative background color
   );
 
   static var lightModeAppTheme = ThemeData.light().copyWith(
@@ -56,16 +54,19 @@ class ThemeNotifier extends StateNotifier<ThemeData> {
   ThemeMode _mode;
   ThemeNotifier({ThemeMode mode = ThemeMode.dark})
       : _mode = mode,
-        super(Pallete.darkModeAppTheme) {
+        super(
+          Pallete.darkModeAppTheme,
+        ) {
     getTheme();
   }
 
   ThemeMode get mode => _mode;
 
-  getTheme() async {
+  void getTheme() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    final theme = prefs.getString("theme");
-    if (theme == "light") {
+    final theme = prefs.getString('theme');
+
+    if (theme == 'light') {
       _mode = ThemeMode.light;
       state = Pallete.lightModeAppTheme;
     } else {
@@ -74,19 +75,17 @@ class ThemeNotifier extends StateNotifier<ThemeData> {
     }
   }
 
-  toggleTheme() async {
+  void toggleTheme() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     if (_mode == ThemeMode.dark) {
       _mode = ThemeMode.light;
       state = Pallete.lightModeAppTheme;
-      prefs.setString("theme", "light");
+      prefs.setString('theme', 'light');
     } else {
       _mode = ThemeMode.dark;
       state = Pallete.darkModeAppTheme;
-      prefs.setString("theme", "dark");
+      prefs.setString('theme', 'dark');
     }
-    print(prefs.getString("theme"));
-    print(_mode);
   }
 }
