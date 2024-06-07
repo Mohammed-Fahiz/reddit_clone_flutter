@@ -9,4 +9,4 @@ class Loader extends StatelessWidget {
       child: CircularProgressIndicator(),
     );
   }
-}
+}    
